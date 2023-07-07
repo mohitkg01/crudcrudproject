@@ -21,15 +21,15 @@ function onSubmit(e){
         ));
        
         //Adding delete btn
-        var name=JSON.stringify(nameInput.value);
-        var deleteBtn=document.createElement('button');
+        //var name=JSON.stringify(nameInput.value);
+        const deleteBtn=document.createElement('button');
         deleteBtn.className='btn btn-danger btn-sm float-right delete';
 
         deleteBtn.appendChild(document.createTextNode('delete'));
         li.appendChild(deleteBtn);
 
         // Adding edit btn
-        var editBtn=document.createElement('button');
+        const editBtn=document.createElement('button');
         editBtn.className='btn btn-danger btn-sm float-right edit';
 
         editBtn.appendChild(document.createTextNode('edit'));
@@ -38,14 +38,14 @@ function onSubmit(e){
         editBtn.addEventListener('click',editItem);
         
         //Calling by Apis
-        axios.post("https://crudcrud.com/api/937df5bf696b4ad09f77fb97640c1b90/Datas",{
-            name:`${nameInput.value}`,
-            email:`${emailInput.value}`
+        axios.post("https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas",{
+            name:nameInput.value,
+            email:emailInput.value
         })
         .then((response)=>{
             console.log(response);
             //addimg in local storage
-            localStorage.setItem(name,JSON.stringify(response.data));
+            localStorage.setItem(response.data._id,JSON.stringify(response.data));
         })
         .catch((err)=>{
             console.log(err);
@@ -59,25 +59,56 @@ function onSubmit(e){
 
         //Adding to the list
         userList.appendChild(li);
-    }
-   
- 
-    
+        nameInput.value = '';
+        emailInput.value = '';
+    }  
 }
 
 
 //Remove items
-function removeIt(e){
-    if(e.target.classList.contains('delete')){
-        if(confirm('Are You Sure?')){
-            var li=e.target.parentElement;
-            var name=JSON.stringify(li.firstChild.textContent.split(':')[0].trim());
-            //console.log(name);
+
+function removeIt(e) {
+    if (e.target.classList.contains('delete')) {
+      if (confirm('Are You Sure?')) {
+        const li = e.target.parentElement;
+        const itemId = li.id;
+  
+        // Deleting from the API
+        axios.delete(`https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas/${itemId}`)
+          .then((res) => {
+            // Removing from the UI
             userList.removeChild(li);
-            //localStorage.removeItem(name);
-        }
-   }
-}
+  
+            // Removing from local storage
+            localStorage.removeItem(itemId);
+          })
+          .catch((err) => console.log(err));
+      }
+    }
+  }
+
+// function removeIt(e){
+   
+//     console.log(_id);
+//     axios.delete(`https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas/${_id}`)
+//     .then((res)=>{
+//         userList.removeAttribute(userId);
+        
+//     })
+//     .catch((err)=>console.log(err));
+//     if(e.target.classList.contains('delete')){
+//         if(confirm('Are You Sure?')){
+//             var li=e.target.parentElement;
+//             var name=JSON.stringify(li.firstChild.textContent.split(':')[0].trim());
+//             //console.log(name);
+//             userList.removeChild(li);
+            
+//             localStorage.removeItem(name);
+    
+           
+//         }
+//    }
+//}
 
 function editItem(e){
     var li=e.target.parentElement;
@@ -132,15 +163,19 @@ function editItem(e){
 //     }  
 // }
 function reteriveDetails(){
-    axios.get("https:///crudcrud.com/api/937df5bf696b4ad09f77fb97640c1b90/Datas")
+    axios.get("https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas")
     .then((res)=>{
        const uesrList = document.getElementById("userList");
-        for(let i=0;i<res.data.length;i++){
-            const d=res.data[i];
+       res.data.forEach((item) => {
+        const li = document.createElement("li");
+        li.id = item._id;
+        li.appendChild(document.createTextNode(`${item.name}: ${item.email}`));
+        // for(let i=0;i<res.data.length;i++){
+        //     const d=res.data[i];
 
 
-            const li=document.createElement("li");
-            li.appendChild(document.createTextNode(`${d.name}:${d.email}`));
+        //     const li=document.createElement("li");
+        //     li.appendChild(document.createTextNode(`${d.name}:${d.email}`));
             
 
             //Adding Edit button
@@ -157,7 +192,7 @@ function reteriveDetails(){
 
             userList.appendChild(li);
       
-        }
+        });
     })
     .catch((err)=>console.log(err))
 }
