@@ -27,6 +27,7 @@ function onSubmit(e){
 
         deleteBtn.appendChild(document.createTextNode('delete'));
         li.appendChild(deleteBtn);
+        //deleteBtn.addEventListener('click',removeIt);
 
         // Adding edit btn
         const editBtn=document.createElement('button');
@@ -38,7 +39,7 @@ function onSubmit(e){
         editBtn.addEventListener('click',editItem);
         
         //Calling by Apis
-        axios.post("https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas",{
+        axios.post("https://crudcrud.com/api/0215f99c8d4d41aba34ac5d3642f2f3e/Datas",{
             name:nameInput.value,
             email:emailInput.value
         })
@@ -65,6 +66,7 @@ function onSubmit(e){
 }
 
 
+
 //Remove items
 
 function removeIt(e) {
@@ -74,7 +76,7 @@ function removeIt(e) {
         const itemId = li.id;
   
         // Deleting from the API
-        axios.delete(`https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas/${itemId}`)
+        axios.delete(`https://crudcrud.com/api/0215f99c8d4d41aba34ac5d3642f2f3e/Datas/${itemId}`)
           .then((res) => {
             // Removing from the UI
             userList.removeChild(li);
@@ -111,19 +113,58 @@ function removeIt(e) {
 //}
 
 function editItem(e){
-    var li=e.target.parentElement;
-    var name=JSON.stringify(li.firstChild.textContent.split(':')[0].trim());
-    var email=li.firstChild.textContent.split(':')[1].trim();
-    
-    //set the value
-    var n=JSON.parse(name);
-    nameInput.value=n;
-    emailInput.value=email;
-    //removing the user
-    userList.removeChild(li);
-    //remove the user from local storage
-    localStorage.removeItem(name);
+     var li=e.target.parentElement;
+     const itemId=li.id;
+    //  const newName=
+    //  const newEmail=
+     axios.put(`https://crudcrud.com/api/0215f99c8d4d41aba34ac5d3642f2f3e/Datas/${itemId}`,{
+        name:nameInput.value,
+        email:emailInput.value
+     })
+     .then((res)=>{
+        //removing the user
+        userList.removeChild(li);
+      //remove the user from local storage
+        localStorage.removeItem(itemId);
 
+        //creating a new li element with updated data
+        const updateLi=document.createElement('li');
+        updateLi.id = itemId;
+        updateLi.appendChild(document.createTextNode(`${newName}: ${newEmail}`));
+        //Adding delete btn
+        const deleteBtn=document.createElement('button');
+        deleteBtn.className='btn btn-danger btn-sm float-right delete';
+
+        deleteBtn.appendChild(document.createTextNode('delete'));
+        updateLi.appendChild(deleteBtn);
+
+        // Adding edit btn
+        const editBtn=document.createElement('button');
+        editBtn.className='btn btn-danger btn-sm float-right edit';
+
+        editBtn.appendChild(document.createTextNode('edit'));
+        updateLi.appendChild(editBtn);
+       
+        //adding event listners
+        deleteBtn.addEventListener('click',removeIt)
+        editBtn.addEventListener('click',editItem);   
+     
+        userList.appendChild(updateLi);  
+     })
+     .catch((err)=>console.log(err));
+    // var name=JSON.stringify(li.firstChild.textContent.split(':')[0].trim());
+    // var name=li.firstChild.textContent.split(':')[0].trim();
+     //var email=li.firstChild.textContent.split(':')[1].trim();
+    
+    // //set the value
+    // var n=JSON.parse(name);
+    // nameInput.value=name;
+    // emailInput.value=email;
+     //removing the user
+     //userList.removeChild(li);
+     //remove the user from local storage
+    // localStorage.removeItem(itemId);
+   
 
   
 }
@@ -163,7 +204,7 @@ function editItem(e){
 //     }  
 // }
 function reteriveDetails(){
-    axios.get("https://crudcrud.com/api/393c296022594ad3b2720c9a62634544/Datas")
+    axios.get("https://crudcrud.com/api/0215f99c8d4d41aba34ac5d3642f2f3e/Datas")
     .then((res)=>{
        const uesrList = document.getElementById("userList");
        res.data.forEach((item) => {
@@ -179,16 +220,18 @@ function reteriveDetails(){
             
 
             //Adding Edit button
-            const delBtn=document.createElement('button');
-            delBtn.className='btn btn-secondary btn-sm float-right delete';
-            delBtn.appendChild(document.createTextNode('delete'));
-            li.appendChild(delBtn);
+            const deleteBtn=document.createElement('button');
+            deleteBtn.className='btn btn-secondary btn-sm float-right delete';
+            deleteBtn.appendChild(document.createTextNode('delete'));
+            li.appendChild(deleteBtn);
 
             //Adding edit btn
             const editBtn=document.createElement('button');
             editBtn.className='btn btn-secondary btn-sm float-right edit';
             editBtn.appendChild(document.createTextNode('edit'));
             li.appendChild(editBtn);
+
+            editBtn.addEventListener('click',editItem);
 
             userList.appendChild(li);
       
